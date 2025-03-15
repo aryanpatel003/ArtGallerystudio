@@ -929,11 +929,11 @@ modal.remove();
 const mobileMenuButton = document.getElementById('mobileMenuButton');
 const navMenu = document.getElementById('navMenu');
 
-const toggleMobileMenu = (show) => {
-  if (window.innerWidth < 768) { // Only apply mobile behavior below 768px
-    if (show) {
+const toggleMobileMenu = () => {
+  if (window.innerWidth < 768) {
+    if (navMenu.classList.contains('hidden')) {
       navMenu.classList.remove('hidden', 'opacity-0', 'scale-95');
-      navMenu.classList.add('flex', 'flex-col', 'absolute', 'top-full', 'left-0', 'right-0', 'bg-white', 'shadow-lg', 'p-4', 'space-y-4', 'opacity-100', 'scale-100', 'transition-all', 'duration-200', 'ease-out', 'transform');
+      navMenu.classList.add('flex', 'flex-col', 'absolute', 'top-full', 'left-0', 'right-0', 'bg-white', 'shadow-lg', 'p-4', 'space-y-4', 'opacity-100', 'scale-100', 'transition-all', 'duration-200', 'ease-out');
     } else {
       navMenu.classList.add('hidden', 'opacity-0', 'scale-95');
       navMenu.classList.remove('flex', 'flex-col', 'absolute', 'top-full', 'left-0', 'right-0', 'bg-white', 'shadow-lg', 'p-4', 'space-y-4', 'opacity-100', 'scale-100');
@@ -941,16 +941,17 @@ const toggleMobileMenu = (show) => {
   }
 };
 
-mobileMenuButton.addEventListener('click', () => {
-  const isHidden = navMenu.classList.contains('hidden');
-  toggleMobileMenu(isHidden);
+mobileMenuButton.addEventListener('click', (e) => {
+  e.stopPropagation(); // Prevent click from bubbling up to document
+  toggleMobileMenu();
 });
 
 document.addEventListener('click', (event) => {
-  if (window.innerWidth < 768 && // Only trigger on mobile
+  if (window.innerWidth < 768 && 
       !navMenu.contains(event.target) && 
-      !mobileMenuButton.contains(event.target)) {
-    toggleMobileMenu(false);
+      !mobileMenuButton.contains(event.target) && 
+      !navMenu.classList.contains('hidden')) {
+    toggleMobileMenu();
   }
 });
 
@@ -959,29 +960,24 @@ window.addEventListener('resize', () => {
   clearTimeout(resizeTimer);
   resizeTimer = setTimeout(() => {
     if (window.innerWidth >= 768) {
-      // Reset to desktop styles
       navMenu.classList.remove('hidden', 'flex', 'flex-col', 'absolute', 'top-full', 'left-0', 'right-0', 'bg-white', 'shadow-lg', 'p-4', 'space-y-4', 'opacity-0', 'scale-95', 'opacity-100', 'scale-100');
       navMenu.classList.add('md:flex');
       navMenu.style.transform = '';
       navMenu.style.opacity = '';
-    } else {
-      // Ensure mobile menu is hidden by default unless toggled
-      if (!navMenu.classList.contains('flex')) {
-        navMenu.classList.add('hidden');
-      }
+    } else if (!navMenu.classList.contains('flex')) {
+      navMenu.classList.add('hidden');
+      navMenu.classList.remove('md:flex', 'flex', 'flex-col', 'absolute', 'top-full', 'left-0', 'right-0', 'bg-white', 'shadow-lg', 'p-4', 'space-y-4', 'opacity-100', 'scale-100');
     }
   }, 100);
 });
 
 // Initialize mobile menu state on page load
-document.addEventListener('DOMContentLoaded', () => {
-  if (window.innerWidth < 768) {
-    navMenu.classList.add('hidden');
-  } else {
-    navMenu.classList.add('md:flex'); // Ensure desktop menu is visible
-    navMenu.classList.remove('hidden'); // Prevent hiding on desktop
-  }
-});
+if (window.innerWidth < 768) {
+  navMenu.classList.add('hidden');
+} else {
+  navMenu.classList.add('md:flex');
+  navMenu.classList.remove('hidden');
+}
 });
 </script>
 </body>
